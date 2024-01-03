@@ -9,6 +9,7 @@ public class CharController : MonoBehaviour
     private bool walkingRight = true;
     public Transform rayStart;
     private Animator anim;
+    public GameObject crystalEffect;
     // Start is called before the first frame update
     void Awake()
     {
@@ -36,13 +37,11 @@ public class CharController : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            Debug.Log("1");
             Switch();
         }
         RaycastHit hit;
         if (!Physics.Raycast(rayStart.position, -transform.up, out hit, Mathf.Infinity))
         {
-            Debug.Log("1");
             anim.SetTrigger("isFalling");
         }
         if (transform.position.y < -2)
@@ -54,6 +53,11 @@ public class CharController : MonoBehaviour
 
     private void Switch()
     {
+        if(!gameManager.gameStarted) 
+        {
+            return;
+        }
+
         walkingRight = !walkingRight;
         if (walkingRight)
         {
@@ -64,4 +68,17 @@ public class CharController : MonoBehaviour
             transform.rotation = Quaternion.Euler(0, -45, 0);
         }
     }
+
+    private void OnTriggerEnter(Collider collider)
+    {
+        if (collider.tag == "crystal")
+        {
+            gameManager.IncreaseScore();           
+            GameObject g = Instantiate(crystalEffect, rayStart.transform.position, Quaternion.identity);
+            Destroy(g,2);
+            Destroy(collider.gameObject);
+
+        }
+    }
+    
 }
